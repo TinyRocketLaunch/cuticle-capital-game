@@ -51,3 +51,11 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
 - GitHub auth verified for account `TinyRocketLaunch`.
 - Headless validation command succeeded with Godot 4.6 console binary.
 - Repo remains canonical source of truth across machines.
+
+## Session Handoff (2026-02-16)
+- User confirmed next session should begin with:
+  1. Pedicure service unlock + balancing
+  2. Queue/capacity simulation
+  3. Missions/objectives panel
+  4. First hireable assistant automation
+- Current branch is expected to remain `main` unless feature-branch workflow is requested later.
