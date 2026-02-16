@@ -1,7 +1,6 @@
 # Godot ignores
 .godot/
 .import/
-export_presets.cfg
 
 # OS/editor
 .DS_Store

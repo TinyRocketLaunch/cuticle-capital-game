@@ -1,0 +1,94 @@
+{
+  "starting_state": {
+    "cash": 0,
+    "debt": 2500,
+    "reputation": 0,
+    "location_tier": 0
+  },
+  "service": {
+    "name": "Basic Manicure",
+    "duration_sec": 6.0,
+    "payout": 14.0,
+    "reputation_gain": 1
+  },
+  "upgrades": [
+    {
+      "id": "starter_kit",
+      "title": "Starter Tool Kit",
+      "description": "Better tools increase payout.",
+      "base_cost": 50,
+      "cost_multiplier": 1.45,
+      "effects": {
+        "service_payout_mult": 0.12
+      }
+    },
+    {
+      "id": "speed_drills",
+      "title": "Speed Drill Practice",
+      "description": "Reduces manicure duration.",
+      "base_cost": 75,
+      "cost_multiplier": 1.5,
+      "effects": {
+        "service_duration_mult": -0.08
+      }
+    },
+    {
+      "id": "social_posts",
+      "title": "Social Promo Posts",
+      "description": "Adds passive bookings per second.",
+      "base_cost": 120,
+      "cost_multiplier": 1.65,
+      "effects": {
+        "auto_income_per_sec": 0.4,
+        "reputation_bonus": 1
+      }
+    },
+    {
+      "id": "gel_upgrade",
+      "title": "Gel Service Add-On",
+      "description": "Higher-value packages for each client.",
+      "base_cost": 260,
+      "cost_multiplier": 1.75,
+      "effects": {
+        "service_payout_mult": 0.22,
+        "reputation_bonus": 2
+      }
+    },
+    {
+      "id": "booking_board",
+      "title": "Booking Board",
+      "description": "Improves throughput and passive demand.",
+      "base_cost": 460,
+      "cost_multiplier": 1.85,
+      "effects": {
+        "service_duration_mult": -0.1,
+        "auto_income_per_sec": 1.0
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "bedroom",
+      "name": "Bedroom Setup",
+      "unlock_cost": 0,
+      "required_debt": 999999,
+      "passive_income_bonus": 0.0
+    },
+    {
+      "id": "small_suite",
+      "name": "Small Rental Suite",
+      "unlock_cost": 2500,
+      "required_debt": 0,
+      "passive_income_bonus": 0.6
+    }
+  ],
+  "daily_login": {
+    "base_reward": 35,
+    "streak_increment": 20,
+    "max_streak_bonus_steps": 7
+  },
+  "save": {
+    "autosave_interval_sec": 12,
+    "offline_progress_cap_sec": 14400
+  }
+}

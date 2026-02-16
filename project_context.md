@@ -4,33 +4,50 @@
 Browser-first idle/tycoon nail salon game built in Godot. Player starts with school debt and minimal equipment, then scales operations through upgrades, staffing, and location expansion.
 
 ## Recent Progress
-- Initialized repository and documentation scaffold.
-- Created dedicated game concept document for gameplay vision and reward design.
-- Established milestone plan with immediate implementation tasks.
+- Implemented a runnable Godot 4.6 project in `godot/` with main scene `res://scenes/Main.tscn`.
+- Built playable core loop: start service -> progress bar -> payout -> repeat.
+- Added economy systems from JSON config (`godot/data/economy.json`):
+  - cash, debt, reputation
+  - 5 upgrades with scaling costs/effects
+  - location unlock flow (bedroom -> small suite)
+- Added retention and persistence foundations:
+  - daily login reward streak logic
+  - save/load on `user://savegame.json`
+  - autosave timer and offline passive income catch-up
+- Added Web export preset config in `godot/export_presets.cfg`.
+- Added repeatable QA script `tools/qa/economy_sanity.ps1`.
+- Verified project via headless Godot startup and QA script.
 
 ## Immediate Next Steps
-1. Create base Godot 4 project in `godot/` with a minimal playable scene.
-2. Implement first loop: tap/click to complete basic manicure service and gain cash.
-3. Add starter economy config (service payout, service duration, first two upgrades).
-4. Add save/load using local storage-compatible persistence for web.
-5. Prepare first web export profile and verify local browser build.
+1. Add a second service type (pedicure) with unlock condition and separate pacing values.
+2. Introduce queue/capacity mechanics so upgrades affect throughput, not just multipliers.
+3. Add first mission/objective panel with milestone rewards.
+4. Implement simple staff system (one hireable assistant) for semi-automation.
+5. Perform first Web export build to `build/web/` and run local browser smoke test.
 
 ## Long-Term Strategy
-- Ship vertical slices: core loop -> upgrades -> expansion tiers -> retention systems.
-- Keep balance values data-driven (JSON/resource files) so economy tuning is fast.
-- Build with mobile UX constraints in mind even during web-first development.
+- Continue modular vertical slices with strict playable checkpoints.
+- Keep economy, locations, and upgrades fully data-driven to speed balancing.
+- Add lightweight balancing telemetry hooks early (session income, upgrade purchase timing, churn points).
 
 ## Blockers/Risks
-- Idle game balance can drift quickly without telemetry and controlled tuning passes.
-- Web performance and save persistence need early validation to avoid late rework.
-- Scope creep risk from adding too many side systems before core loop is compelling.
+- No visual polish/art pipeline yet; current prototype is functional UI-only.
+- Web export profile exists, but full browser packaging/export still needs a first pass.
+- Balance is pre-telemetry and likely to require several tuning iterations.
 
 ## Key Files Changed
+- `.gitignore`
 - `README.md`
 - `project_context.md`
-- `docs/plans/milestone_plan.md`
-- `game-concept.md`
+- `godot/project.godot`
+- `godot/scenes/Main.tscn`
+- `godot/scripts/main.gd`
+- `godot/data/economy.json`
+- `godot/export_presets.cfg`
+- `godot/README.md`
+- `tools/qa/economy_sanity.ps1`
 
 ## Environment Notes
 - GitHub auth verified for account `TinyRocketLaunch`.
-- Repo intended as canonical source of truth across machines.
+- Headless validation command succeeded with Godot 4.6 console binary.
+- Repo remains canonical source of truth across machines.

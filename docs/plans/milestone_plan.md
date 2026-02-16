@@ -27,8 +27,15 @@
 - Late-game sinks to preserve meaningful decisions.
 
 ## Immediate Next Steps
-1. Initialize Godot project in `godot/` and commit generated baseline files.
-2. Implement single-service state machine and clickable interaction.
-3. Add economy config file and parse on startup.
-4. Wire simple upgrade purchase and effects.
-5. Add autosave every 10-15 seconds + on important actions.
+1. Add a second service type (pedicure) with unlock progression.
+2. Implement queue/capacity simulation tied to station upgrades.
+3. Add missions/objectives panel with milestone cash rewards.
+4. Introduce first staff hire and automation behavior.
+5. Perform first full Web export build and browser smoke test.
+
+## Completed In Current Build
+- Initialized Godot project scaffold in `godot/`.
+- Implemented single-service state machine and clickable interaction loop.
+- Added JSON economy config load on startup.
+- Added upgrade purchase system and applied effects.
+- Added autosave plus save/load with offline passive income catch-up.
