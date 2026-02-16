@@ -1,0 +1,14 @@
+# Godot ignores
+.godot/
+.import/
+export_presets.cfg
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build artifacts
+*.pck
+*.tmp
