@@ -5,12 +5,80 @@
     "reputation": 0,
     "location_tier": 0
   },
-  "service": {
-    "name": "Basic Manicure",
-    "duration_sec": 6.0,
-    "payout": 14.0,
-    "reputation_gain": 1
+  "services": [
+    {
+      "id": "manicure",
+      "name": "Basic Manicure",
+      "duration_sec": 6.0,
+      "payout": 14.0,
+      "reputation_gain": 1,
+      "unlock": {
+        "type": "always"
+      }
+    },
+    {
+      "id": "pedicure",
+      "name": "Pedicure",
+      "duration_sec": 8.5,
+      "payout": 24.0,
+      "reputation_gain": 2,
+      "unlock": {
+        "type": "total_services",
+        "value": 18
+      }
+    }
+  ],
+  "queue": {
+    "base_capacity": 4,
+    "base_demand_per_sec": 0.35,
+    "reputation_demand_scale": 0.01
   },
+  "staff": {
+    "assistant": {
+      "hire_cost": 900,
+      "wage_per_sec": 0.12,
+      "payout_mult": 0.72,
+      "speed_mult": 0.9
+    }
+  },
+  "missions": [
+    {
+      "id": "first_10_clients",
+      "title": "Serve 10 clients",
+      "condition": {
+        "type": "total_services",
+        "target": 10
+      },
+      "rewards": {
+        "cash": 140,
+        "reputation": 2
+      }
+    },
+    {
+      "id": "pedicure_unlock",
+      "title": "Reach 18 total services",
+      "condition": {
+        "type": "total_services",
+        "target": 18
+      },
+      "rewards": {
+        "cash": 220,
+        "reputation": 3
+      }
+    },
+    {
+      "id": "suite_ready",
+      "title": "Reach reputation 20",
+      "condition": {
+        "type": "reputation",
+        "target": 20
+      },
+      "rewards": {
+        "cash": 300,
+        "reputation": 5
+      }
+    }
+  ],
   "upgrades": [
     {
       "id": "starter_kit",
@@ -25,21 +93,23 @@
     {
       "id": "speed_drills",
       "title": "Speed Drill Practice",
-      "description": "Reduces manicure duration.",
+      "description": "Improves throughput and reduces service duration.",
       "base_cost": 75,
       "cost_multiplier": 1.5,
       "effects": {
-        "service_duration_mult": -0.08
+        "service_duration_mult": -0.08,
+        "throughput_mult": 0.05
       }
     },
     {
       "id": "social_posts",
       "title": "Social Promo Posts",
-      "description": "Adds passive bookings per second.",
+      "description": "Adds passive bookings and baseline passive income.",
       "base_cost": 120,
       "cost_multiplier": 1.65,
       "effects": {
         "auto_income_per_sec": 0.4,
+        "demand_per_sec_bonus": 0.06,
         "reputation_bonus": 1
       }
     },
@@ -57,12 +127,24 @@
     {
       "id": "booking_board",
       "title": "Booking Board",
-      "description": "Improves throughput and passive demand.",
+      "description": "Improves queue capacity and passive demand.",
       "base_cost": 460,
       "cost_multiplier": 1.85,
       "effects": {
-        "service_duration_mult": -0.1,
+        "queue_capacity_bonus": 1,
+        "demand_per_sec_bonus": 0.1,
         "auto_income_per_sec": 1.0
+      }
+    },
+    {
+      "id": "lane_optimization",
+      "title": "Lane Optimization",
+      "description": "Standardized workflow raises throughput.",
+      "base_cost": 740,
+      "cost_multiplier": 1.9,
+      "effects": {
+        "throughput_mult": 0.09,
+        "service_duration_mult": -0.04
       }
     }
   ],
@@ -72,14 +154,16 @@
       "name": "Bedroom Setup",
       "unlock_cost": 0,
       "required_debt": 999999,
-      "passive_income_bonus": 0.0
+      "passive_income_bonus": 0.0,
+      "queue_capacity_bonus": 0
     },
     {
       "id": "small_suite",
       "name": "Small Rental Suite",
       "unlock_cost": 2500,
       "required_debt": 0,
-      "passive_income_bonus": 0.6
+      "passive_income_bonus": 0.6,
+      "queue_capacity_bonus": 2
     }
   ],
   "daily_login": {
