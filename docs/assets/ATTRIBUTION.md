@@ -1,12 +1,9 @@
 # Attribution
 
-Fill this file whenever non-CC0 assets are included.
+No mandatory attribution is currently required for imported assets, because all imported packs are licensed CC0.
 
-## Template
-- Asset pack:
-- Author:
-- Source URL:
-- License:
-- Required attribution text:
-- Files used:
-- Notes:
+## Optional Credit
+- Kenney (https://kenney.nl/)
+
+## Notes
+- If future assets use CC-BY (or other attribution-required licenses), add explicit attribution entries here.

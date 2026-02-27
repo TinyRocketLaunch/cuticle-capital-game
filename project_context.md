@@ -31,14 +31,22 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
   - `docs/assets/ATTRIBUTION.md`
   - `docs/assets/open_asset_sources.md`
   - `godot/assets/` typed subfolders for UI/sprites/tilesets/audio.
+- Imported first curated CC0 visual baseline from Kenney packs:
+  - UI textures/icons + font from UI Pack
+  - floor tiles + customer sprites from Topdown Shooter
+  - sources downloaded to local `docs/assets/raw/` cache (gitignored).
+- Wired imported assets into runtime UI:
+  - themed font, skinned primary/secondary buttons, icon usage
+  - decorative customer portraits
+  - textured background layer for visual depth.
 - Re-validated via headless Godot startup, QA script, and web export.
 
 ## Immediate Next Steps
 1. Instrument telemetry analysis tooling (`tools/qa`) to summarize `telemetry.jsonl` into balancing reports.
-2. Import first cohesive CC0 visual asset baseline (UI panels/icons + basic environment sprites).
-3. Add one more location tier and at least 2 new missions to prevent mid-loop plateau.
-4. Add audio cues (service start/complete, purchase, mission claim) with CC0 SFX pack.
-5. Reduce message-log spam from assistant completions (queue events into a compact feed).
+2. Add one more location tier and at least 2 new missions to prevent mid-loop plateau.
+3. Add audio cues (service start/complete, purchase, mission claim) with CC0 SFX pack.
+4. Reduce message-log spam from assistant completions (queue events into a compact feed).
+5. Replace decorative-only asset usage with gameplay-state visuals (service station states, queue occupancy markers).
 
 ## Long-Term Strategy
 - Continue modular vertical slices with strict playable checkpoints.
@@ -50,6 +58,7 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
 - Export templates are machine-local; fresh machines must run `tools/setup/install_godot_export_templates.ps1` before web export.
 - Current tuning is still first-pass; assistant + queue loops can drift without telemetry-driven tuning scripts.
 - Assistant completion currently updates the shared message area frequently, which can reduce UX clarity during fast loops.
+- Imported visuals are currently a curated subset; style cohesion is improved but still provisional pending full art direction pass.
 
 ## Key Files Changed
 - `.gitignore`
@@ -67,6 +76,10 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
 - `docs/assets/asset_manifest.md`
 - `docs/assets/ATTRIBUTION.md`
 - `docs/assets/open_asset_sources.md`
+- `godot/assets/fonts/kenney/kenney_future.ttf`
+- `godot/assets/ui/kenney/*`
+- `godot/assets/sprites/kenney/*`
+- `godot/assets/tilesets/kenney/*`
 - `godot/assets/.gitkeep`
 - `godot/assets/ui/.gitkeep`
 - `godot/assets/sprites/.gitkeep`
@@ -84,9 +97,9 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
   2. Telemetry/KPI instrumentation in UI and event logs
   3. First balance retune pass
   4. First successful web export + local HTTP smoke
-  5. Asset sourcing/attribution workflow scaffolding
+  5. Asset sourcing/attribution workflow + first CC0 asset integration pass
 - Next session priority order:
   1. Build telemetry summary QA script and use it for second balancing pass
-  2. Import first cohesive CC0 art pack set (UI + sprites + tiles)
-  3. Add third location tier and expanded mission chain
+  2. Add third location tier and expanded mission chain
+  3. Integrate SFX and richer gameplay-state visuals
 - Current branch remains `main`.

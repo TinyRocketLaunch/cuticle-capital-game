@@ -13,3 +13,4 @@ Thumbs.db
 *.tmp
 godot/build/
 *.uid
+docs/assets/raw/

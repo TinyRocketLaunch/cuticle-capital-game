@@ -2,6 +2,15 @@ extends Control
 
 const SAVE_PATH := "user://savegame.json"
 const TELEMETRY_PATH := "user://telemetry.jsonl"
+const KENNEY_FONT_PATH := "res://assets/fonts/kenney/kenney_future.ttf"
+const UI_BUTTON_PRIMARY_PATH := "res://assets/ui/kenney/button_primary.png"
+const UI_BUTTON_SECONDARY_PATH := "res://assets/ui/kenney/button_secondary.png"
+const UI_BUTTON_FLAT_PATH := "res://assets/ui/kenney/button_flat.png"
+const UI_ICON_CHECK_PATH := "res://assets/ui/kenney/icon_checkmark.png"
+const UI_ICON_STAR_PATH := "res://assets/ui/kenney/icon_star.png"
+const TILE_BACKGROUND_PATH := "res://assets/tilesets/kenney/floor_tile_01.png"
+const CUSTOMER_MALE_PATH := "res://assets/sprites/kenney/customer_male.png"
+const CUSTOMER_FEMALE_PATH := "res://assets/sprites/kenney/customer_female.png"
 
 var economy: Dictionary = {}
 var state: Dictionary = {
@@ -160,6 +169,18 @@ func _initialize_state_from_config() -> void:
     state["selected_service_id"] = _get_default_unlocked_service_id()
 
 func _build_ui() -> void:
+    _apply_visual_theme()
+
+    var floor_tex := _load_texture_if_exists(TILE_BACKGROUND_PATH)
+    if floor_tex != null:
+        var background := TextureRect.new()
+        background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+        background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        background.stretch_mode = TextureRect.STRETCH_SCALE
+        background.texture = floor_tex
+        background.modulate = Color(0.65, 0.72, 0.78, 0.35)
+        add_child(background)
+
     var root := MarginContainer.new()
     root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     root.add_theme_constant_override("margin_left", 18)
@@ -194,6 +215,37 @@ func _build_ui() -> void:
     ui["subtitle"] = Label.new()
     ui["subtitle"].text = "From bedroom debt to salon owner"
     left.add_child(ui["subtitle"])
+
+    var portraits := HBoxContainer.new()
+    portraits.add_theme_constant_override("separation", 8)
+    left.add_child(portraits)
+
+    var customer_male_tex := _load_texture_if_exists(CUSTOMER_MALE_PATH)
+    if customer_male_tex != null:
+        var portrait_male := TextureRect.new()
+        portrait_male.texture = customer_male_tex
+        portrait_male.custom_minimum_size = Vector2(56, 56)
+        portrait_male.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        portrait_male.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        portraits.add_child(portrait_male)
+
+    var customer_female_tex := _load_texture_if_exists(CUSTOMER_FEMALE_PATH)
+    if customer_female_tex != null:
+        var portrait_female := TextureRect.new()
+        portrait_female.texture = customer_female_tex
+        portrait_female.custom_minimum_size = Vector2(56, 56)
+        portrait_female.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        portrait_female.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        portraits.add_child(portrait_female)
+
+    var star_tex := _load_texture_if_exists(UI_ICON_STAR_PATH)
+    if star_tex != null:
+        var star_icon := TextureRect.new()
+        star_icon.texture = star_tex
+        star_icon.custom_minimum_size = Vector2(42, 42)
+        star_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        star_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        portraits.add_child(star_icon)
 
     ui["cash"] = Label.new()
     left.add_child(ui["cash"])
@@ -247,6 +299,7 @@ func _build_ui() -> void:
     ui["service_button"].text = "Start Service"
     ui["service_button"].custom_minimum_size = Vector2(280, 56)
     ui["service_button"].pressed.connect(_on_service_pressed)
+    _apply_button_skin(ui["service_button"], true)
     left.add_child(ui["service_button"])
 
     ui["progress"] = ProgressBar.new()
@@ -261,16 +314,26 @@ func _build_ui() -> void:
     ui["pay_debt"] = Button.new()
     ui["pay_debt"].text = "Pay $50 Debt"
     ui["pay_debt"].pressed.connect(_on_pay_debt_pressed)
+    _apply_button_skin(ui["pay_debt"], false)
     debt_row.add_child(ui["pay_debt"])
 
     ui["location_button"] = Button.new()
     ui["location_button"].text = "Unlock Next Location"
     ui["location_button"].pressed.connect(_on_unlock_location_pressed)
+    _apply_button_skin(ui["location_button"], false)
     debt_row.add_child(ui["location_button"])
 
     ui["hire_assistant"] = Button.new()
     ui["hire_assistant"].pressed.connect(_on_hire_assistant_pressed)
+    _apply_button_skin(ui["hire_assistant"], false)
     left.add_child(ui["hire_assistant"])
+
+    var check_icon := _load_texture_if_exists(UI_ICON_CHECK_PATH)
+    if check_icon != null:
+        ui["service_button"].icon = check_icon
+        ui["pay_debt"].icon = check_icon
+        ui["location_button"].icon = check_icon
+        ui["hire_assistant"].icon = check_icon
 
     var mission_header := Label.new()
     mission_header.text = "Objectives"
@@ -1066,3 +1129,58 @@ func _log_telemetry_event(event_name: String, payload: Dictionary) -> void:
     else:
         file.seek_end()
     file.store_line(JSON.stringify(log_entry))
+
+
+func _load_texture_if_exists(path: String) -> Texture2D:
+    if not ResourceLoader.exists(path):
+        return null
+    return load(path) as Texture2D
+
+
+func _apply_visual_theme() -> void:
+    if not ResourceLoader.exists(KENNEY_FONT_PATH):
+        return
+    var font := load(KENNEY_FONT_PATH) as FontFile
+    if font == null:
+        return
+    var app_theme := Theme.new()
+    app_theme.default_font = font
+    app_theme.default_font_size = 18
+    theme = app_theme
+
+
+func _make_stylebox_from_texture(path: String):
+    var tex := _load_texture_if_exists(path)
+    if tex == null:
+        return null
+    var box := StyleBoxTexture.new()
+    box.texture = tex
+    box.texture_margin_left = 12.0
+    box.texture_margin_right = 12.0
+    box.texture_margin_top = 12.0
+    box.texture_margin_bottom = 12.0
+    box.content_margin_left = 22.0
+    box.content_margin_right = 22.0
+    box.content_margin_top = 10.0
+    box.content_margin_bottom = 10.0
+    return box
+
+
+func _apply_button_skin(button: Button, is_primary: bool) -> void:
+    var normal_path := UI_BUTTON_PRIMARY_PATH if is_primary else UI_BUTTON_SECONDARY_PATH
+    var hover_path := UI_BUTTON_SECONDARY_PATH if is_primary else UI_BUTTON_PRIMARY_PATH
+    var pressed_path := UI_BUTTON_FLAT_PATH
+
+    var normal_box: StyleBoxTexture = _make_stylebox_from_texture(normal_path)
+    var hover_box: StyleBoxTexture = _make_stylebox_from_texture(hover_path)
+    var pressed_box: StyleBoxTexture = _make_stylebox_from_texture(pressed_path)
+    var disabled_box: StyleBoxTexture = _make_stylebox_from_texture(UI_BUTTON_FLAT_PATH)
+
+    if normal_box != null:
+        button.add_theme_stylebox_override("normal", normal_box)
+    if hover_box != null:
+        button.add_theme_stylebox_override("hover", hover_box)
+    if pressed_box != null:
+        button.add_theme_stylebox_override("pressed", pressed_box)
+    if disabled_box != null:
+        button.add_theme_stylebox_override("disabled", disabled_box)

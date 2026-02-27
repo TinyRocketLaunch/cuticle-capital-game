@@ -11,3 +11,9 @@ This folder contains the Godot 4 project for Cuticle Capital.
 
 ## Web Build Output
 - `build/web/`: exported HTML5 artifacts (`index.html`, `.wasm`, `.js`, `.pck`).
+
+## Current Imported Art
+- `assets/fonts/kenney/`: UI font used by runtime theme.
+- `assets/ui/kenney/`: button skins and icons used by runtime controls.
+- `assets/sprites/kenney/`: decorative customer sprites in the HUD.
+- `assets/tilesets/kenney/`: floor tile texture used as background layer.
