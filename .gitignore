@@ -11,3 +11,5 @@ Thumbs.db
 # Build artifacts
 *.pck
 *.tmp
+godot/build/
+*.uid

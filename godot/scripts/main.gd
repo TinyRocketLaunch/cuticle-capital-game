@@ -1,6 +1,7 @@
 extends Control
 
 const SAVE_PATH := "user://savegame.json"
+const TELEMETRY_PATH := "user://telemetry.jsonl"
 
 var economy: Dictionary = {}
 var state: Dictionary = {
@@ -39,6 +40,12 @@ var upgrade_row_by_id: Dictionary = {}
 var mission_row_by_id: Dictionary = {}
 var service_option_ids: Array[String] = []
 
+var session_start_timestamp := 0
+var session_start_services := 0
+var session_start_lifetime_earned := 0.0
+var session_elapsed_sec := 0.0
+var queue_full_seconds := 0.0
+
 
 func _ready() -> void:
     if not _load_economy_config():
@@ -48,16 +55,20 @@ func _ready() -> void:
     _initialize_state_from_config()
     _build_ui()
     _load_save()
+    _init_session_metrics()
     _apply_daily_login_reward()
     _refresh_derived_stats()
     _refresh_ui()
 
 
 func _process(delta: float) -> void:
+    session_elapsed_sec += delta
     _process_queue_demand(delta)
     _process_manual_service(delta)
     _process_assistant_service(delta)
     _process_passive_income(delta)
+    if int(state["customer_queue"]) >= _compute_queue_capacity():
+        queue_full_seconds += delta
 
     autosave_elapsed += delta
     if autosave_elapsed >= float(economy["save"]["autosave_interval_sec"]):
@@ -210,6 +221,15 @@ func _build_ui() -> void:
 
     ui["assistant_status"] = Label.new()
     left.add_child(ui["assistant_status"])
+
+    ui["kpi_income"] = Label.new()
+    left.add_child(ui["kpi_income"])
+
+    ui["kpi_spm"] = Label.new()
+    left.add_child(ui["kpi_spm"])
+
+    ui["kpi_queue_pressure"] = Label.new()
+    left.add_child(ui["kpi_queue_pressure"])
 
     var service_row := HBoxContainer.new()
     service_row.add_theme_constant_override("separation", 8)
@@ -397,6 +417,13 @@ func _complete_manual_service() -> void:
     state["lifetime_cash_earned"] = float(state["lifetime_cash_earned"]) + payout
     state["reputation"] = int(state["reputation"]) + _service_reputation_gain(current_service_id)
     state["total_services"] = int(state["total_services"]) + 1
+    _log_telemetry_event("service_complete", {
+        "service_id": current_service_id,
+        "source": "player",
+        "payout": payout,
+        "total_services": int(state["total_services"]),
+        "queue": int(state["customer_queue"])
+    })
     _set_message("%s complete: +$%s" % [_service_name(current_service_id), _fmt_money(payout)])
     _refresh_derived_stats()
     _refresh_ui()
@@ -437,6 +464,13 @@ func _complete_assistant_service() -> void:
     state["lifetime_cash_earned"] = float(state["lifetime_cash_earned"]) + payout
     state["reputation"] = int(state["reputation"]) + maxi(1, int(round(_service_reputation_gain(assistant_service_id) * 0.5)))
     state["total_services"] = int(state["total_services"]) + 1
+    _log_telemetry_event("service_complete", {
+        "service_id": assistant_service_id,
+        "source": "assistant",
+        "payout": payout,
+        "total_services": int(state["total_services"]),
+        "queue": int(state["customer_queue"])
+    })
     _set_message("Assistant completed %s: +$%s" % [_service_name(assistant_service_id), _fmt_money(payout)])
     _refresh_derived_stats()
     _refresh_ui()
@@ -507,6 +541,12 @@ func _on_unlock_location_pressed() -> void:
     state["cash"] = float(state["cash"]) - float(next_location["unlock_cost"])
     state["location_tier"] = next_idx
     state["reputation"] = int(state["reputation"]) + 10
+    _log_telemetry_event("location_unlock", {
+        "location_id": String(next_location["id"]),
+        "cash_after": float(state["cash"]),
+        "debt_after": float(state["debt"]),
+        "total_services": int(state["total_services"])
+    })
     _set_message("Unlocked: %s" % String(next_location["name"]))
     _refresh_ui()
     _save_game()
@@ -523,6 +563,11 @@ func _on_hire_assistant_pressed() -> void:
 
     state["cash"] = float(state["cash"]) - cost
     state["assistant_hired"] = true
+    _log_telemetry_event("assistant_hired", {
+        "hire_cost": cost,
+        "cash_after": float(state["cash"]),
+        "total_services": int(state["total_services"])
+    })
     _set_message("Assistant hired. They will auto-serve queued clients.")
     _refresh_ui()
     _save_game()
@@ -542,6 +587,13 @@ func _on_buy_upgrade_pressed(upgrade_id: String) -> void:
     state["cash"] = float(state["cash"]) - cost
     state["upgrade_levels"][upgrade_id] = level + 1
     state["reputation"] = int(state["reputation"]) + int(upgrade["effects"].get("reputation_bonus", 0))
+    _log_telemetry_event("upgrade_purchase", {
+        "upgrade_id": upgrade_id,
+        "new_level": level + 1,
+        "cost": cost,
+        "cash_after": float(state["cash"]),
+        "total_services": int(state["total_services"])
+    })
     _set_message("Purchased %s Lv %d" % [String(upgrade["title"]), level + 1])
     _refresh_derived_stats()
     _refresh_ui()
@@ -566,6 +618,12 @@ func _on_claim_mission_pressed(mission_id: String) -> void:
     state["lifetime_cash_earned"] = float(state["lifetime_cash_earned"]) + cash_reward
     state["reputation"] = int(state["reputation"]) + rep_reward
     state["missions_claimed"][mission_id] = true
+    _log_telemetry_event("mission_claimed", {
+        "mission_id": mission_id,
+        "cash_reward": cash_reward,
+        "rep_reward": rep_reward,
+        "cash_after": float(state["cash"])
+    })
     _set_message("Objective claimed: +$%s, +%d rep" % [_fmt_money(cash_reward), rep_reward])
     _refresh_ui()
     _save_game()
@@ -683,6 +741,9 @@ func _refresh_runtime_ui() -> void:
     ui["passive"].text = "Passive Income: $%s/sec" % _fmt_money(_compute_passive_income_per_sec())
     ui["queue"].text = "Queue: %d / %d" % [int(state["customer_queue"]), _compute_queue_capacity()]
     ui["demand"].text = "Demand Rate: %.2f clients/sec" % _compute_demand_per_sec()
+    ui["kpi_income"].text = "Session Income: $%s" % _fmt_money(_session_income())
+    ui["kpi_spm"].text = "Services/Min: %.2f" % _services_per_minute()
+    ui["kpi_queue_pressure"].text = "Queue Pressure: %.0f%%" % (_queue_pressure_ratio() * 100.0)
 
     if bool(state.get("assistant_hired", false)):
         if assistant_running:
@@ -958,3 +1019,50 @@ func _apply_daily_login_reward() -> void:
 func _set_message(text: String) -> void:
     if ui.has("message"):
         ui["message"].text = text
+
+
+func _init_session_metrics() -> void:
+    session_start_timestamp = int(Time.get_unix_time_from_system())
+    session_start_services = int(state.get("total_services", 0))
+    session_start_lifetime_earned = float(state.get("lifetime_cash_earned", 0.0))
+    session_elapsed_sec = 0.0
+    queue_full_seconds = 0.0
+    _log_telemetry_event("session_start", {
+        "cash": float(state["cash"]),
+        "debt": float(state["debt"]),
+        "services": int(state["total_services"]),
+        "location_tier": int(state["location_tier"])
+    })
+
+
+func _session_income() -> float:
+    return maxf(0.0, float(state.get("lifetime_cash_earned", 0.0)) - session_start_lifetime_earned)
+
+
+func _services_per_minute() -> float:
+    if session_elapsed_sec <= 1.0:
+        return 0.0
+    var delta_services: int = int(state.get("total_services", 0)) - session_start_services
+    return float(delta_services) * 60.0 / session_elapsed_sec
+
+
+func _queue_pressure_ratio() -> float:
+    if session_elapsed_sec <= 0.1:
+        return 0.0
+    return clampf(queue_full_seconds / session_elapsed_sec, 0.0, 1.0)
+
+
+func _log_telemetry_event(event_name: String, payload: Dictionary) -> void:
+    var log_entry := {
+        "ts": int(Time.get_unix_time_from_system()),
+        "event": event_name,
+        "payload": payload
+    }
+    var file: FileAccess = FileAccess.open(TELEMETRY_PATH, FileAccess.READ_WRITE)
+    if file == null:
+        file = FileAccess.open(TELEMETRY_PATH, FileAccess.WRITE)
+        if file == null:
+            return
+    else:
+        file.seek_end()
+    file.store_line(JSON.stringify(log_entry))

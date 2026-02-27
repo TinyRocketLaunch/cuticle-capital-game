@@ -15,15 +15,30 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
   - hireable assistant with cost + wage drain
   - assistant auto-processes queued clients using value-per-second prioritization
 - Refactored `godot/scripts/main.gd` for save-compatible state evolution (legacy saves still merge).
+- Added telemetry hooks in `godot/scripts/main.gd`:
+  - session KPIs in UI (`Session Income`, `Services/Min`, `Queue Pressure`)
+  - JSONL event logging to `user://telemetry.jsonl` for upgrade purchases, service completion, mission claims, assistant hire, and location unlocks.
+- Completed first balancing pass in `godot/data/economy.json`:
+  - slower early demand rate
+  - higher debt/location thresholds
+  - later pedicure unlock and adjusted mission targets/rewards
+  - higher assistant entry cost + wage pressure.
 - Updated QA checks in `tools/qa/economy_sanity.ps1` to validate new schema fields (`services`, `queue`, `staff`, missions).
-- Re-validated via headless Godot startup and QA script.
+- Added export-template installer workflow scripts under `tools/setup/`.
+- Completed first web export build to `godot/build/web/` and validated local HTTP smoke (`index.html` returned 200).
+- Added asset pipeline docs and structure:
+  - `docs/assets/asset_manifest.md`
+  - `docs/assets/ATTRIBUTION.md`
+  - `docs/assets/open_asset_sources.md`
+  - `godot/assets/` typed subfolders for UI/sprites/tilesets/audio.
+- Re-validated via headless Godot startup, QA script, and web export.
 
 ## Immediate Next Steps
-1. Add lightweight telemetry logging (`session income`, `services/min`, `upgrade purchase timestamps`) to support balancing.
-2. Do first balancing pass now that queue + assistant loops exist (target debt payoff and location unlock timing).
-3. Import first cohesive CC0 visual asset baseline (UI panels/icons + basic environment sprites).
-4. Execute first Web export build to `build/web/` and run browser smoke test.
-5. Add one more location tier and at least 2 new missions to prevent mid-loop plateau.
+1. Instrument telemetry analysis tooling (`tools/qa`) to summarize `telemetry.jsonl` into balancing reports.
+2. Import first cohesive CC0 visual asset baseline (UI panels/icons + basic environment sprites).
+3. Add one more location tier and at least 2 new missions to prevent mid-loop plateau.
+4. Add audio cues (service start/complete, purchase, mission claim) with CC0 SFX pack.
+5. Reduce message-log spam from assistant completions (queue events into a compact feed).
 
 ## Long-Term Strategy
 - Continue modular vertical slices with strict playable checkpoints.
@@ -32,8 +47,8 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
 
 ## Blockers/Risks
 - No visual polish/art pipeline yet; current prototype is functional UI-only.
-- Web export profile exists, but full browser packaging/export still needs a first pass.
-- Current tuning is still manual/pre-telemetry; assistant + queue loops can drift into runaway or stall states without measured pacing targets.
+- Export templates are machine-local; fresh machines must run `tools/setup/install_godot_export_templates.ps1` before web export.
+- Current tuning is still first-pass; assistant + queue loops can drift without telemetry-driven tuning scripts.
 - Assistant completion currently updates the shared message area frequently, which can reduce UX clarity during fast loops.
 
 ## Key Files Changed
@@ -47,6 +62,16 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
 - `godot/export_presets.cfg`
 - `godot/README.md`
 - `tools/qa/economy_sanity.ps1`
+- `tools/setup/install_godot_export_templates.ps1`
+- `tools/setup/apply_existing_templates.ps1`
+- `docs/assets/asset_manifest.md`
+- `docs/assets/ATTRIBUTION.md`
+- `docs/assets/open_asset_sources.md`
+- `godot/assets/.gitkeep`
+- `godot/assets/ui/.gitkeep`
+- `godot/assets/sprites/.gitkeep`
+- `godot/assets/tilesets/.gitkeep`
+- `godot/assets/audio/.gitkeep`
 
 ## Environment Notes
 - GitHub auth verified for account `TinyRocketLaunch`.
@@ -55,12 +80,13 @@ Browser-first idle/tycoon nail salon game built in Godot. Player starts with sch
 
 ## Session Handoff (2026-02-27)
 - Newly completed this session:
-  1. Pedicure unlock path
-  2. Queue/capacity simulation tied to upgrades/locations
-  3. Objectives panel with claimable rewards
-  4. Hireable assistant automation
+  1. Pedicure unlock path + queue/capacity + objectives + assistant automation
+  2. Telemetry/KPI instrumentation in UI and event logs
+  3. First balance retune pass
+  4. First successful web export + local HTTP smoke
+  5. Asset sourcing/attribution workflow scaffolding
 - Next session priority order:
-  1. Telemetry hooks + balancing pass
-  2. Web export and browser smoke
-  3. First cohesive CC0 art integration
+  1. Build telemetry summary QA script and use it for second balancing pass
+  2. Import first cohesive CC0 art pack set (UI + sprites + tiles)
+  3. Add third location tier and expanded mission chain
 - Current branch remains `main`.

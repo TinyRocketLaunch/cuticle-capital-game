@@ -28,5 +28,13 @@ A browser-first idle/tycoon game about building a nail salon empire from a debt-
 2. Economy sanity QA:
    - `powershell -ExecutionPolicy Bypass -File tools/qa/economy_sanity.ps1`
 
+## Web Export
+1. Install export templates (one-time per machine):
+   - `powershell -ExecutionPolicy Bypass -File tools/setup/install_godot_export_templates.ps1`
+2. Build web output:
+   - `& 'C:\Users\Rocket\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.6-stable_win64_console.exe' --headless --path godot --export-release 'Web' build/web/index.html`
+3. Optional local smoke HTTP check:
+   - `powershell -Command "$job = Start-Job -ScriptBlock { param($dir) python -m http.server 8765 --directory $dir } -ArgumentList (Resolve-Path 'godot/build/web'); Start-Sleep -Seconds 2; (Invoke-WebRequest -Uri 'http://127.0.0.1:8765/index.html' -UseBasicParsing).StatusCode; Stop-Job $job; Remove-Job $job"`
+
 ## Notes
 This repo is initialized with planning docs first so we can keep design and implementation synchronized from day one.

@@ -1,7 +1,7 @@
 {
   "starting_state": {
     "cash": 0,
-    "debt": 2500,
+    "debt": 3000,
     "reputation": 0,
     "location_tier": 0
   },
@@ -9,8 +9,8 @@
     {
       "id": "manicure",
       "name": "Basic Manicure",
-      "duration_sec": 6.0,
-      "payout": 14.0,
+      "duration_sec": 6.5,
+      "payout": 12.0,
       "reputation_gain": 1,
       "unlock": {
         "type": "always"
@@ -19,62 +19,62 @@
     {
       "id": "pedicure",
       "name": "Pedicure",
-      "duration_sec": 8.5,
-      "payout": 24.0,
+      "duration_sec": 9.0,
+      "payout": 28.0,
       "reputation_gain": 2,
       "unlock": {
         "type": "total_services",
-        "value": 18
+        "value": 55
       }
     }
   ],
   "queue": {
     "base_capacity": 4,
-    "base_demand_per_sec": 0.35,
-    "reputation_demand_scale": 0.01
+    "base_demand_per_sec": 0.2,
+    "reputation_demand_scale": 0.006
   },
   "staff": {
     "assistant": {
-      "hire_cost": 900,
-      "wage_per_sec": 0.12,
-      "payout_mult": 0.72,
+      "hire_cost": 1400,
+      "wage_per_sec": 0.18,
+      "payout_mult": 0.68,
       "speed_mult": 0.9
     }
   },
   "missions": [
     {
       "id": "first_10_clients",
-      "title": "Serve 10 clients",
+      "title": "Serve 20 clients",
       "condition": {
         "type": "total_services",
-        "target": 10
+        "target": 20
       },
       "rewards": {
-        "cash": 140,
+        "cash": 180,
         "reputation": 2
       }
     },
     {
       "id": "pedicure_unlock",
-      "title": "Reach 18 total services",
+      "title": "Reach 55 total services",
       "condition": {
         "type": "total_services",
-        "target": 18
+        "target": 55
       },
       "rewards": {
-        "cash": 220,
+        "cash": 320,
         "reputation": 3
       }
     },
     {
       "id": "suite_ready",
-      "title": "Reach reputation 20",
+      "title": "Reach reputation 35",
       "condition": {
         "type": "reputation",
-        "target": 20
+        "target": 35
       },
       "rewards": {
-        "cash": 300,
+        "cash": 400,
         "reputation": 5
       }
     }
@@ -160,7 +160,7 @@
     {
       "id": "small_suite",
       "name": "Small Rental Suite",
-      "unlock_cost": 2500,
+      "unlock_cost": 3200,
       "required_debt": 0,
       "passive_income_bonus": 0.6,
       "queue_capacity_bonus": 2
